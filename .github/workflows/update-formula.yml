@@ -1,0 +1,104 @@
+name: Update Formula
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 0.1.4)"
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release binaries and compute SHA256
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -euo pipefail
+          BASE="https://github.com/hdresearch/ziggit/releases/download/v${VERSION}"
+
+          declare -A files=(
+            ["macos-aarch64"]="ziggit-macos-aarch64"
+            ["macos-x86_64"]="ziggit-macos-x86_64"
+            ["linux-aarch64"]="ziggit-linux-aarch64"
+            ["linux-x86_64"]="ziggit-linux-x86_64"
+          )
+
+          for key in "${!files[@]}"; do
+            file="${files[$key]}"
+            curl -fsSL -o "/tmp/${file}" -L "${BASE}/${file}"
+            sha=$(sha256sum "/tmp/${file}" | awk '{print $1}')
+            echo "${key}_sha=${sha}" >> "$GITHUB_ENV"
+            echo "${key}: ${sha}"
+          done
+
+      - name: Update formula
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          cat > Formula/ziggit.rb << 'FORMULA'
+          class Ziggit < Formula
+            desc "A modern git implementation written in pure Zig — 4-10× faster, 142KB WASM, succinct mode for LLMs"
+            homepage "https://github.com/hdresearch/ziggit"
+            version "VERSION_PLACEHOLDER"
+            license "GPL-2.0-only"
+
+            on_macos do
+              on_arm do
+                url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-macos-aarch64"
+                sha256 "SHA_MACOS_AARCH64"
+              end
+
+              on_intel do
+                url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-macos-x86_64"
+                sha256 "SHA_MACOS_X86_64"
+              end
+            end
+
+            on_linux do
+              on_arm do
+                url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-linux-aarch64"
+                sha256 "SHA_LINUX_AARCH64"
+              end
+
+              on_intel do
+                url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-linux-x86_64"
+                sha256 "SHA_LINUX_X86_64"
+              end
+            end
+
+            def install
+              binary = Dir.glob("ziggit-*").first
+              if binary.nil?
+                binary = Dir.glob("ziggit*").reject { |f| f.end_with?(".rb") }.first
+              end
+              bin.install binary => "ziggit"
+            end
+
+            test do
+              assert_match "git version", shell_output("#{bin}/ziggit --version")
+            end
+          end
+          FORMULA
+
+          sed -i "s/VERSION_PLACEHOLDER/${VERSION}/" Formula/ziggit.rb
+          sed -i "s/SHA_MACOS_AARCH64/${macos_aarch64_sha}/" Formula/ziggit.rb
+          sed -i "s/SHA_MACOS_X86_64/${macos_x86_64_sha}/" Formula/ziggit.rb
+          sed -i "s/SHA_LINUX_AARCH64/${linux_aarch64_sha}/" Formula/ziggit.rb
+          sed -i "s/SHA_LINUX_X86_64/${linux_x86_64_sha}/" Formula/ziggit.rb
+
+          # Fix indentation (heredoc adds extra spaces)
+          sed -i 's/^          //' Formula/ziggit.rb
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/ziggit.rb
+          git commit -m "Update ziggit to v${VERSION}"
+          git push
