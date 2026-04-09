@@ -1,30 +1,30 @@
 class Ziggit < Formula
   desc "A modern git implementation written in pure Zig — 4-10× faster, 142KB WASM, succinct mode for LLMs"
   homepage "https://github.com/hdresearch/ziggit"
-  version "0.1.14"
+  version "0.1.15"
   license "GPL-2.0-only"
 
   on_macos do
     on_arm do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-macos-aarch64"
-      sha256 "64078682f33169cc7c1f08bb0384641a7febc45cc58d3d5349787724f88ff937"
+      sha256 "13af419f17c1c36aea7c9ecf64ada5a90ceb46b66a53b1ff3217850c7239c5ec"
     end
 
     on_intel do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-macos-x86_64"
-      sha256 "7acb3af1ec9dcabd3bd4d28fec02c1ccfaa197c42aba00e9c9fb277e5f2097ba"
+      sha256 "248c2a474f748a0818c2317a3755a9e30395892f1fcb46ed4de9261a8fd72d9f"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-linux-aarch64"
-      sha256 "735f783326637ed246e2e1fc709ae58fdbf2cde245b62f3bc50f33683cd0a554"
+      sha256 "81827b7c74a1bf3553bb6f004340a07783639bbd79354d31b79de4cdefbf6dca"
     end
 
     on_intel do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-linux-x86_64"
-      sha256 "43200f5cd063a55ab83980a0c3c45571329b1b1b99ee9f825b26edbd5d091e1b"
+      sha256 "25d97143e3d6ff8b3704f6117b3571c8c5e3bf68ab56fef8325bf8be8bef50fc"
     end
   end
 
