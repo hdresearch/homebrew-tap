@@ -7,7 +7,7 @@ class Ziggit < Formula
   on_macos do
     on_arm do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-macos-aarch64"
-      sha256 "376b9c315fd9f1e29dc284dfaa0937d48b9587fd0e7ee6c70e5f6926e45bd53c"
+      sha256 "88c17fb10b0096e0ba0afaee3dc4a45145becc9febc7221c53bdac9db5bc3ef1"
     end
 
     on_intel do
@@ -19,12 +19,12 @@ class Ziggit < Formula
   on_linux do
     on_arm do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-linux-aarch64"
-      sha256 "be2f02988572fc1231fd249296c6999acd526f82208d808f3e67466e3513d7bc"
+      sha256 "ef655d232838139261338542bdd30c1da9bc82602eed244f8b783d45d04e8598"
     end
 
     on_intel do
       url "https://github.com/hdresearch/ziggit/releases/download/v#{version}/ziggit-linux-x86_64"
-      sha256 "ca3eb474789fec358e43e7fe21b0cab02af7fadfb3d3a4865379d23020476a79"
+      sha256 "21619256c37a33f81e8d81a4ca8cee30d7fa33d7b8b9243480ba7f65221240eb"
     end
   end
 
